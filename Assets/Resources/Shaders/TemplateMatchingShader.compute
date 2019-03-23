@@ -1,0 +1,39 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> srcTemplate;
+RWTexture2D<float4> resGraph;
+
+int size;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 color,colorTemplate;
+    float c,cGray,cGrayTemplate;
+
+    float cSum,cSumSrc,cSumTemplate;
+
+    int offset = (size - 1) * 0.5;
+
+    for (int x = -offset; x <= offset; x++)
+    {
+        for (int y = -offset; y <= offset; y++)
+	    {
+            color = src[float2(id.x + x,id.y + y)];
+            colorTemplate = srcTemplate[float2(x + offset,y + offset)];
+
+            cGray = (color.r + color.g + color.b) * 0.3;
+            cGrayTemplate = (colorTemplate.r + colorTemplate.g + colorTemplate.b) * 0.3;
+
+            cSum += cGray * cGrayTemplate;
+            cSumSrc += cGray * cGray;
+            cSumTemplate += cGrayTemplate * cGrayTemplate;
+	    }   
+    }
+
+    c = cSum / sqrt(cSumSrc * cSumTemplate);
+
+    resGraph[id.xy] = float4(c,c,c,1);
+} 

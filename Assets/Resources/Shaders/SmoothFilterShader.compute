@@ -1,0 +1,52 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> srcGray;
+RWTexture2D<float4> res;
+RWTexture2D<float4> resGray;
+
+int size,sigma;
+float coef;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 color, grayScale, grayScaleFiltered ,sum;
+    float k, gray, pi, left,e,offset;
+
+    pi = 3.1415926535;
+
+    offset = floor(size * 0.5);
+
+    left = 1 / (2 * pi * pow(sigma,2));
+
+    for (float x = -offset; x <= offset; x++)
+    {
+        for (float y = -offset; y <= offset; y++)
+	    {
+            color = src[float2(id.x + x, id.y + y)]; 
+
+            e = (pow(x,2) + pow(y,2)) / (2 * pow(sigma,2));
+
+            k = left * exp(-e);
+
+	        sum += color * k;
+	    }                   
+    }
+
+    color = src[id.xy];
+
+    gray = (color.r + color.g + color.b) * 0.3;
+    grayScale = float4(gray,gray,gray,1);
+
+    srcGray[id.xy] = grayScale;
+
+    sum.a = 1;
+
+    gray = (sum.r + sum.g + sum.b) * 0.3;
+    grayScaleFiltered = float4(gray,gray,gray,1);
+
+    res[id.xy] = color - coef * sum;
+    resGray[id.xy] = grayScaleFiltered - coef * grayScale;
+} 

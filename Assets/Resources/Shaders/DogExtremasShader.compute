@@ -1,0 +1,59 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> src2;
+RWTexture2D<float4> src3;
+RWTexture2D<float4> res;
+
+float threshold;
+int scale;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 cGreen = float4(0,1,0,1);
+
+    float cMax = threshold, c;
+    int iMax,jMax;
+
+    for (int i = -1; i <= 1; i++)
+    {
+	     for (int j = -1; j <= 1; j++)
+	     {
+		        c = src[float2(id.x + i,id.y + j)].r;
+
+		        if (cMax < c)
+		        {
+		            cMax = c;
+		            iMax = i;
+		            jMax = j;
+		        }
+
+		        c = src2[float2(id.x + i,id.y + j)].r;
+
+		        if (cMax < c)
+		        {
+		            cMax = c;
+		            iMax = i;
+		            jMax = j;
+		        }
+
+		        c = src3[float2(id.x + i,id.y + j)].r;
+
+		        if (cMax < c)
+		        {
+		            cMax = c;
+		            iMax = i;
+		            jMax = j;
+		        }
+	     }    
+    }
+
+    c = src2[id.xy].r;
+
+    if (c == cMax)
+    {
+        res[float2(id.x * scale,id.y * scale)] = cGreen;
+    }
+} 

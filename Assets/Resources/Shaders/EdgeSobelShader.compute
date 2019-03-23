@@ -1,0 +1,72 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> res;
+RWTexture2D<float4> resH;
+RWTexture2D<float4> resV;
+
+float intensity,threshold;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x == 0 || id.x == 255 || id.y == 0 || id.y == 255)
+    {
+        res[id.xy] = float4(0,0,0,1);
+	    resH[id.xy] = float4(0,0,0,1);
+	    resV[id.xy] = float4(0,0,0,1);
+
+        return;
+    }
+
+    float4 color = src[float2(id.x,id.y)];
+
+    float4 colorTop = src[float2(id.x,id.y + 1)];
+    float4 colorBottom = src[float2(id.x,id.y - 1)];
+
+    float4 colorTopLeft = src[float2(id.x - 1,id.y + 1)];
+    float4 colorLeft = src[float2(id.x - 1,id.y)];
+    float4 colorBottomLeft = src[float2(id.x - 1,id.y - 1)];
+
+    float4 colorTopRight = src[float2(id.x + 1,id.y + 1)];
+    float4 colorRight = src[float2(id.x + 1,id.y)];
+    float4 colorBottomRight = src[float2(id.x + 1,id.y - 1)];
+
+    float4 colorDiffH = 0,colorDiffV = 0;
+
+    colorDiffH += colorTopRight - colorTopLeft;
+    colorDiffH += 2 * (colorRight - colorLeft);
+    colorDiffH += colorBottomRight - colorBottomLeft;
+
+    colorDiffV += colorTopLeft - colorBottomLeft;
+    colorDiffV += 2 * (colorTop - colorBottom);
+    colorDiffV += colorTopRight - colorBottomRight;
+
+    colorDiffH *= 0.125;
+    colorDiffV *= 0.125;
+
+    float cGrayH = (colorDiffH.r + colorDiffH.g + colorDiffH.b) * 0.3;
+    float cGrayV = (colorDiffV.r + colorDiffV.g + colorDiffV.b) * 0.3;
+
+    float cMagGray = sqrt(pow(cGrayH,2) + pow(cGrayV,2));
+
+    cGrayH += intensity;
+    cGrayV += intensity;
+    cMagGray += intensity;
+
+    float4 cMag;
+
+    cMag = float4(cMagGray,cMagGray,cMagGray,1);
+
+    /*
+    if (intensity * threshold < cMagGray)
+        cMag = float4(cMagGray,cMagGray + (0.1),cMagGray,1);
+    else
+        cMag = float4(cMagGray,cMagGray,cMagGray,1);
+    */
+
+    res[id.xy] = cMag;
+    resH[id.xy] = float4(cGrayH,cGrayH,cGrayH,1);
+    resV[id.xy] = float4(cGrayV,cGrayV,cGrayV,1);
+} 

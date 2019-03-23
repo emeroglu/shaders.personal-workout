@@ -1,0 +1,57 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> srcGray;
+RWTexture2D<float4> res;
+RWTexture2D<float4> resGray;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 colors[9];
+    float csGray[9];
+
+    float4 color;
+    float c;
+
+    for (int x = -1; x <= 1; x++)
+    {
+	    for (int y = -1; y <= 1; y++)
+	    {
+            color = src[float2(id.x + x,id.y + y)];
+            colors[(x + 1) * 3 + (y + 1)] = color;
+
+            c = (color.r + color.b + color.g) * 0.3;
+
+	        csGray[(x + 1) * 3 + (y + 1)] = c;
+            srcGray[float2(id.x + x,id.y + y)] = float4(c,c,c,1);
+	    }       
+    }
+
+    float cMin;
+    int iMin;
+
+    for (int k = 0; k < 4; k++)
+    {
+
+	    cMin = 1;
+	    iMin = -1;
+
+	    for (int i = 0; i < 9; i++)
+	    {
+	        if (csGray[i] != -1 & csGray[i] < cMin)
+	        {
+	            cMin = csGray[i];
+	            iMin = i;
+	        }
+	    }
+
+	    csGray[iMin] = -1;
+
+    }
+
+    res[id.xy] = colors[iMin];
+    resGray[id.xy] = float4(cMin,cMin,cMin,1);
+
+} 

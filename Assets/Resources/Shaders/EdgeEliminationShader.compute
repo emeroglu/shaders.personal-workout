@@ -1,0 +1,29 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> srcEx;
+RWTexture2D<float4> srcEdges;
+RWTexture2D<float4> res;
+
+float threshold;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	float4 colorEx = srcEx[id.xy];
+
+    if (colorEx.r == 0 && colorEx.g == 1 && colorEx.b == 0)
+    {
+        float cEdge = srcEdges[id.xy].r;
+
+        if (threshold < cEdge)
+            res[id.xy] = src[id.xy];
+        else
+            res[id.xy] = srcEx[id.xy];
+    }
+    else
+    {
+        res[id.xy] = src[id.xy];
+    }
+}

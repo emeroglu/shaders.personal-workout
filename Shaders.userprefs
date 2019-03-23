@@ -1,0 +1,20 @@
+﻿<Properties StartupConfiguration="{C250F7AE-1E54-E072-0827-5988138401D9}|" StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.ItemProperties.Shaders PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Resources/Shaders/TemplateMatchingShader.compute">
+    <Files>
+      <File FileName="Assets/Scripts/TemplateMatching.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/FeatureDetection.cs" Line="1102" Column="1" />
+      <File FileName="Assets/Resources/Shaders/GaussianShader.compute" Line="1" Column="1" />
+      <File FileName="Assets/Resources/Shaders/DogExtremasShader.compute" Line="15" Column="37" NotebookId="1" />
+      <File FileName="Assets/Resources/Shaders/SubtractorShader.compute" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets/Resources/Shaders/EdgeEliminationShader.compute" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets/Resources/Shaders/TemplateMatchingShader.compute" Line="35" Column="5" NotebookId="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>

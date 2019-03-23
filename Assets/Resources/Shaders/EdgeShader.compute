@@ -1,0 +1,34 @@
+﻿
+#pragma kernel CSMain
+
+RWTexture2D<float4> src;
+RWTexture2D<float4> res;
+RWTexture2D<float4> resH;
+RWTexture2D<float4> resV;
+
+float intensity;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 color = src[float2(id.x,id.y)];
+
+    float4 colorRight = src[float2(id.x + 1,id.y)];
+    float4 colorUp = src[float2(id.x,id.y + 1)];
+
+    float4 colorDiffH = colorRight - color;
+    float4 colorDiffV = colorUp - color;
+
+    float cGrayH = (colorDiffH.r + colorDiffH.g + colorDiffH.b) * 0.3;
+    float cGrayV = (colorDiffV.r + colorDiffV.g + colorDiffV.b) * 0.3;
+
+    float cMag = sqrt(pow(cGrayH,2) + pow(cGrayV,2));
+
+    cGrayH += intensity;
+    cGrayV += intensity;
+    cMag += intensity;
+
+    res[id.xy] = cMag;
+    resH[id.xy] = cGrayH;
+    resV[id.xy] = cGrayV;
+} 
